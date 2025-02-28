@@ -72,7 +72,7 @@ def chat_interface():
 
     with col2:
         unique_ids = list_unique_ids_in_collection(qdrant_client, collection_name)
-        unique_id = st.selectbox("**Select Unique ID:**", index=None,placeholder="Select Unique ID...", options = unique_ids
+        unique_id = st.selectbox("**Select Unique ID:**", index=None,placeholder="Select Unique ID...", options = unique_ids)
  
     
     # Initialize chat history
