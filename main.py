@@ -120,7 +120,7 @@ def chat_interface():
                 try:
                     with requests.post(API_URL, json={"query": query, "unique_id": unique_id}, stream=True) as response:
                         response.raise_for_status()  # Ensure valid response
-                        for line in response.iter_lines(decode_unicode=True):
+                        for chunk in response.iter_lines(decode_unicode=True):
                             if chunk:
                                 response_text += chunk
                                 response_container.markdown(response_text)
