@@ -19,7 +19,15 @@ def main():
 #     st.title("💬 Chat Interface")
 #     st.write("This is where the chat UI will go.")
 
-API_URL = "http://34.47.234.199:8000/generate_answer"
+# API_URL = st.secrets["api"]["URL"]
+# API_URL = "http://34.47.234.199:8000/generate_answer"
+
+API_URL= os.getenv("API_URL")
+if API_URL is None:
+    st.write("API_URL is not set in the environment variables.")
+else:
+    st.write(f"API_URL is set to")
+    
 def chat_interface():
     """Chat interface with streaming response support."""
     st.title("💬 Chat Interface")
@@ -55,7 +63,7 @@ def chat_interface():
                 response_text = ""
 
                 with requests.post(API_URL, json={"query": query, "unique_id": unique_id}, stream=True) as response:
-                    for chunk in response.iter_content(chunk_size=1, decode_unicode=True):
+                    for chunk in response.iter_content(chunk_size=None, decode_unicode=True):
                         if chunk:
                             response_text += chunk
                             response_container.markdown(response_text)
