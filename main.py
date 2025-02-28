@@ -63,12 +63,7 @@ def main():
 def chat_interface():
     """Chat interface with streaming response support."""
     st.markdown("<style>h1 { margin-top: -50px; }</style>", unsafe_allow_html=True)
-    # st.title("💬 Chat Interface")
     
-    # # Sidebar: Input for Unique ID
-    # st.sidebar.title("Settings")
-    # unique_id = st.sidebar.text_input("Enter Unique ID", key="unique_id")
-
     # Create two columns: one for the title and one for the unique ID input field
     col1, col2 = st.columns([3, 2])  # Adjust width ratio if needed
 
@@ -77,8 +72,7 @@ def chat_interface():
 
     with col2:
         unique_ids = list_unique_ids_in_collection(qdrant_client, collection_name)
-        unique_id = st.selectbox("**Select Unique ID:**", index=None,placeholder="Select a hospital or ID...", options = unique_ids)
-        # unique_id = st.text_input("Enter Unique ID", key="unique_id", placeholder="Enter ID here")
+        unique_id = st.selectbox("**Select Unique ID:**", index=None,placeholder="Select Unique ID...", options = unique_ids
  
     
     # Initialize chat history
@@ -91,9 +85,9 @@ def chat_interface():
             st.markdown(msg["content"])
 
     # Chat input field
-    if query := st.chat_input("Ask a medical query..."):
+    if query := st.chat_input("Ask a query..."):
         if not unique_id:
-            st.warning("Please enter a Unique ID in the sidebar.")
+            st.warning("Please Select a Unique ID.")
         else:
             # Append user message to chat history
             st.session_state["messages"].append({"role": "user", "content": query})
