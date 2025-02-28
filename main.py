@@ -15,9 +15,55 @@ def main():
     elif page == "Coming Soon":
         coming_soon()
 
+# def chat_interface():
+#     st.title("💬 Chat Interface")
+#     st.write("This is where the chat UI will go.")
+
+API_URL = "http://34.47.234.199:8000/generate_answer"
 def chat_interface():
+    """Chat interface with streaming response support."""
     st.title("💬 Chat Interface")
-    st.write("This is where the chat UI will go.")
+    
+    # Sidebar: Input for Unique ID
+    st.sidebar.title("Settings")
+    unique_id = st.sidebar.text_input("Enter Unique ID", key="unique_id")
+
+    # Initialize chat history
+    if "messages" not in st.session_state:
+        st.session_state["messages"] = []
+
+    # Display previous chat messages
+    for msg in st.session_state["messages"]:
+        with st.chat_message(msg["role"]):
+            st.markdown(msg["content"])
+
+    # Chat input field
+    if query := st.chat_input("Ask a medical query..."):
+        if not unique_id:
+            st.warning("Please enter a Unique ID in the sidebar.")
+        else:
+            # Append user message to chat history
+            st.session_state["messages"].append({"role": "user", "content": query})
+
+            # Display user message
+            with st.chat_message("user"):
+                st.markdown(query)
+
+            # Send request to API
+            with st.chat_message("assistant"):
+                response_container = st.empty()  # Placeholder for streaming response
+                response_text = ""
+
+                with requests.post(API_URL, json={"query": query, "unique_id": unique_id}, stream=True) as response:
+                    for chunk in response.iter_content(chunk_size=1, decode_unicode=True):
+                        if chunk:
+                            response_text += chunk
+                            response_container.markdown(response_text)
+
+                # Append assistant response to chat history
+                st.session_state["messages"].append({"role": "assistant", "content": response_text})
+
+
 
 def query_history():
     st.title("📜 Query History")
