@@ -33,6 +33,7 @@ def main():
 
 def chat_interface():
     """Chat interface with streaming response support."""
+    st.markdown("<style>h1 { margin-top: -50px; }</style>", unsafe_allow_html=True)
     st.title("💬 Chat Interface")
     
     # Sidebar: Input for Unique ID
@@ -80,10 +81,12 @@ def chat_interface():
                     st.error(f"Error connecting to API: {e}")
 
 def query_history():
+    st.markdown("<style>h1 { margin-top: -50px; }</style>", unsafe_allow_html=True)
     st.title("📜 Query History")
     st.write("This is where past queries will be displayed.")
 
 def coming_soon():
+    st.markdown("<style>h1 { margin-top: -50px; }</style>", unsafe_allow_html=True)
     st.title("🚧 Coming Soon")
     st.write("New features will be added here in the future!")
 
