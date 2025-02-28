@@ -11,6 +11,14 @@ if API_URL is None:
     st.warning("API_URL is not set in the environment variables or Streamlit secrets.")
 
 def main():
+    st.markdown(
+        """
+        <style>
+        h1 { margin-top: -50px; }  /* Adjust as needed */
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
     # Sidebar Navigation
     st.sidebar.title("Navigation")
     page = st.sidebar.radio("Go to", ["Chat Interface", "Query History", "Coming Soon"])
