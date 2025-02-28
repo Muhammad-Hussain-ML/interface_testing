@@ -23,10 +23,13 @@ db = client["query_logs"]
 mongo_collection = db["user_queries"]
 
 @st.cache_resource()
-qdrant_client = QdrantClient(
-    url=os.getenv("QDRANT_URL"),
-    api_key=os.getenv("QDRANT_API_KEY"),
-)
+def get_qdrant_client():
+    return QdrantClient(
+        url=os.getenv("QDRANT_URL"),
+        api_key=os.getenv("QDRANT_API_KEY"),
+    )
+
+qdrant_client = get_qdrant_client()
 
 collection_name = "EMR-Chains-Data"
 
