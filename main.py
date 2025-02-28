@@ -2,6 +2,8 @@ import streamlit as st
 import os
 import requests
 from qdrant_client import QdrantClient
+import pandas as pd
+from pymongo import MongoClient
 
 # ✅ Ensure page config is first
 st.set_page_config(page_title="Interface", layout="wide")
@@ -11,12 +13,23 @@ API_URL = os.getenv("API_URL", st.secrets.get("api", {}).get("URL"))
 if API_URL is None:
     st.warning("API_URL is not set in the environment variables or Streamlit secrets.")
 
+@st.cache_resource()
+def get_mongo_client():
+    MONGO_URI = os.getenv("MONGO_URI")
+    return MongoClient(MONGO_URI)
+
+client = get_mongo_client()
+db = client["query_logs"]
+mongo_collection = db["user_queries"]
+
+@st.cache_resource()
 qdrant_client = QdrantClient(
     url=os.getenv("QDRANT_URL"),
     api_key=os.getenv("QDRANT_API_KEY"),
  )
 
 collection_name = "EMR-Chains-Data"
+
 def list_unique_ids_in_collection(qdrant_client, collection_name, limit=100):
     unique_ids = set()
     next_page_offset = None
@@ -104,7 +117,7 @@ def chat_interface():
                 try:
                     with requests.post(API_URL, json={"query": query, "unique_id": unique_id}, stream=True) as response:
                         response.raise_for_status()  # Ensure valid response
-                        for chunk in response.iter_content(chunk_size=None, decode_unicode=True):
+                        for line in response.iter_lines(decode_unicode=True):
                             if chunk:
                                 response_text += chunk
                                 response_container.markdown(response_text)
@@ -118,7 +131,21 @@ def chat_interface():
 def query_history():
     st.markdown("<style>h1 { margin-top: -50px; }</style>", unsafe_allow_html=True)
     st.title("📜 Query History")
-    st.write("This is where past queries will be displayed.")
+    
+    unique_ids = list_unique_ids_in_collection(qdrant_client, collection_name)
+    unique_id = st.selectbox("**Select Unique ID:**", index=None,placeholder="Select Unique ID...", options = unique_ids)
+
+    if unique_id and unique_id != "Select a hospital or ID...":
+        # Fetch all queries related to the selected unique_id, sorted by latest
+        queries = list(mongo_collection.find({"unique_id": unique_id}).sort("timestamp", -1))
+
+        if queries:
+            df = pd.DataFrame(queries).drop(columns=["_id"], errors="ignore")
+            st.dataframe(df, use_container_width=True)
+        else:
+            st.warning("No queries found for the selected hospital ID.")
+    
+
 
 def coming_soon():
     st.markdown("<style>h1 { margin-top: -50px; }</style>", unsafe_allow_html=True)
