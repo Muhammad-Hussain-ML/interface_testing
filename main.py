@@ -26,7 +26,7 @@ mongo_collection = db["user_queries"]
 qdrant_client = QdrantClient(
     url=os.getenv("QDRANT_URL"),
     api_key=os.getenv("QDRANT_API_KEY"),
- )
+)
 
 collection_name = "EMR-Chains-Data"
 
