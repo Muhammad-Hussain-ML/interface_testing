@@ -14,7 +14,7 @@ def main():
     st.markdown(
         """
         <style>
-        h1 { margin-top: -50px; }  /* Adjust as needed */
+        h1 { margin-top: 50px; }  /* Adjust as needed */
         </style>
         """,
         unsafe_allow_html=True
