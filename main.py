@@ -34,12 +34,22 @@ def main():
 def chat_interface():
     """Chat interface with streaming response support."""
     st.markdown("<style>h1 { margin-top: -50px; }</style>", unsafe_allow_html=True)
-    st.title("💬 Chat Interface")
+    # st.title("💬 Chat Interface")
     
-    # Sidebar: Input for Unique ID
-    st.sidebar.title("Settings")
-    unique_id = st.sidebar.text_input("Enter Unique ID", key="unique_id")
+    # # Sidebar: Input for Unique ID
+    # st.sidebar.title("Settings")
+    # unique_id = st.sidebar.text_input("Enter Unique ID", key="unique_id")
 
+    # Create two columns: one for the title and one for the unique ID input field
+    col1, col2 = st.columns([3, 2])  # Adjust width ratio if needed
+
+    with col1:
+        st.title("💬 Chat Interface")
+
+    with col2:
+        unique_id = st.text_input("Enter Unique ID", key="unique_id", placeholder="Enter ID here")
+ 
+    
     # Initialize chat history
     if "messages" not in st.session_state:
         st.session_state["messages"] = []
