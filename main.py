@@ -27,7 +27,7 @@ API_URL= os.getenv("API_URL")
 if API_URL is None:
     st.write("API_URL is not set in the environment variables.")
 else:
-    st.write(f"API_URL is set to")
+    st.write(f"API_URL is set to{API_URL}")
     
 def chat_interface():
     """Chat interface with streaming response support."""
