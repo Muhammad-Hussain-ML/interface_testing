@@ -9,8 +9,6 @@ st.set_page_config(page_title="Interface", layout="wide")
 API_URL = os.getenv("API_URL", st.secrets.get("api", {}).get("URL"))
 if API_URL is None:
     st.warning("API_URL is not set in the environment variables or Streamlit secrets.")
-else:
-    st.write(f"API_URL is set to: {API_URL}")
 
 def main():
     # Sidebar Navigation
