@@ -1,6 +1,7 @@
 import streamlit as st
 import os
 import requests
+from qdrant_client import QdrantClient
 
 # ✅ Ensure page config is first
 st.set_page_config(page_title="Interface", layout="wide")
