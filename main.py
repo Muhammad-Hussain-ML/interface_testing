@@ -10,6 +10,34 @@ API_URL = os.getenv("API_URL", st.secrets.get("api", {}).get("URL"))
 if API_URL is None:
     st.warning("API_URL is not set in the environment variables or Streamlit secrets.")
 
+qdrant_client = QdrantClient(
+    url=os.getenv("QDRANT_URL"),
+    api_key=os.getenv("QDRANT_API_KEY"),
+ )
+
+collection_name = "EMR-Chains-Data"
+def list_unique_ids_in_collection(qdrant_client, collection_name, limit=100):
+    unique_ids = set()
+    next_page_offset = None
+
+    while True:
+        points, next_page_offset = qdrant_client.scroll(
+            collection_name=collection_name,
+            with_payload=True,
+            limit=limit,
+            offset=next_page_offset,
+        )
+
+        for point in points:
+            if "unique_id" in point.payload:
+                unique_ids.add(point.payload["unique_id"])
+
+        if next_page_offset is None:
+            break
+
+    return list(unique_ids)
+
+
 def main():
     st.markdown(
         """
@@ -47,7 +75,9 @@ def chat_interface():
         st.title("💬 Chat Interface")
 
     with col2:
-        unique_id = st.text_input("Enter Unique ID", key="unique_id", placeholder="Enter ID here")
+        unique_ids = list_unique_ids_in_collection(qdrant_client, collection_name)
+        unique_id = st.selectbox("**Select Unique ID:**", index=None,placeholder="Select a hospital or ID...", options = unique_ids)
+        # unique_id = st.text_input("Enter Unique ID", key="unique_id", placeholder="Enter ID here")
  
     
     # Initialize chat history
