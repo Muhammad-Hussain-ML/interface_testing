@@ -32,7 +32,7 @@ def get_qdrant_client():
 
 qdrant_client = get_qdrant_client()
 
-collection_name = "EMR-Chains-Data"
+collection_name = "new_practice"
 
 def list_unique_ids_in_collection(qdrant_client, collection_name, limit=100):
     unique_ids = set()
