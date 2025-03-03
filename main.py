@@ -156,24 +156,27 @@ def query_history():
         else:
             st.warning("No queries found for the selected hospital ID.")
     
-
 def coming_soon():
     """PDF Upload & Unique ID Check"""
     st.markdown("<style>h1 { margin-top: -50px; }</style>", unsafe_allow_html=True)
     st.title("🚧 Coming Soon - PDF Upload")
 
-    # Create layout with two columns
-    col1, col2 = st.columns([2, 3])
+    # Upload PDF File
+    uploaded_file = st.file_uploader("📄 Upload a PDF file", type=["pdf"])
 
-    with col1:
-        # Upload PDF File
-        uploaded_file = st.file_uploader("📄 Upload a PDF file", type=["pdf"])
+    # Unique ID Input
+    unique_id = st.text_input("🔢 Enter Unique ID")
 
-    with col2:
-        # Unique ID Input
-        unique_id = st.text_input("🔢 Enter Unique ID")
+    # Execute Button
+    if st.button("🚀 Process PDF"):
+        if not uploaded_file:
+            st.warning("⚠️ Please upload a PDF file.")
+            return
 
-    if uploaded_file and unique_id:
+        if not unique_id:
+            st.warning("⚠️ Please enter a Unique ID.")
+            return
+
         # Check if Unique ID already exists
         existing_ids = list_unique_ids_in_collection(qdrant_client, collection_name)
 
@@ -187,12 +190,12 @@ def coming_soon():
                 st.success("✅ Text extracted successfully! Sending to API...")
 
                 # Load API URL from environment variables
-                API_URL = os.getenv("Embedding_API_URL")
+                API_URL = os.getenv("UPLOAD_API_URL")
                 if API_URL is None:
                     st.error("🚨 API URL is not set in environment variables!")
                     return
 
-                # Call the API with extracted text and unique_id
+                # Call the API with extracted text & unique ID
                 with st.spinner("🔄 Uploading data..."):
                     response = requests.post(API_URL, json={"unique_id": unique_id, "text": extracted_text})
 
@@ -203,6 +206,7 @@ def coming_soon():
 
             else:
                 st.warning("⚠️ No text extracted from the PDF. Please check the file.")
+
 
 # def coming_soon():
 #     st.markdown("<style>h1 { margin-top: -50px; }</style>", unsafe_allow_html=True)
