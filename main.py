@@ -190,7 +190,7 @@ def coming_soon():
                 st.success("✅ Text extracted successfully! Sending to API...")
 
                 # Load API URL from environment variables
-                API_URL = os.getenv("UPLOAD_API_URL")
+                API_URL = os.getenv("Embedding_API_URL")
                 if API_URL is None:
                     st.error("🚨 API URL is not set in environment variables!")
                     return
