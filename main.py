@@ -1,5 +1,6 @@
 import streamlit as st
 import os
+import PyPDF2
 import requests
 from qdrant_client import QdrantClient
 import pandas as pd
@@ -54,6 +55,13 @@ def list_unique_ids_in_collection(qdrant_client, collection_name, limit=100):
 
     return list(unique_ids)
 
+def extract_text_from_pdf(pdf_file):
+    """Extract text from a PDF file"""
+    pdf_reader = PyPDF2.PdfReader(pdf_file)
+    text = ""
+    for page in pdf_reader.pages:
+        text += page.extract_text() + "\n"
+    return text.strip()
 
 def main():
     st.markdown(
@@ -149,11 +157,57 @@ def query_history():
             st.warning("No queries found for the selected hospital ID.")
     
 
-
 def coming_soon():
+    """PDF Upload & Unique ID Check"""
     st.markdown("<style>h1 { margin-top: -50px; }</style>", unsafe_allow_html=True)
-    st.title("🚧 Coming Soon")
-    st.write("New features will be added here in the future!")
+    st.title("🚧 Coming Soon - PDF Upload")
+
+    # Create layout with two columns
+    col1, col2 = st.columns([2, 3])
+
+    with col1:
+        # Upload PDF File
+        uploaded_file = st.file_uploader("📄 Upload a PDF file", type=["pdf"])
+
+    with col2:
+        # Unique ID Input
+        unique_id = st.text_input("🔢 Enter Unique ID")
+
+    if uploaded_file and unique_id:
+        # Check if Unique ID already exists
+        existing_ids = list_unique_ids_in_collection(qdrant_client, collection_name)
+
+        if unique_id in existing_ids:
+            st.warning("⚠️ This Unique ID already exists! Please enter a different one.")
+        else:
+            # Extract text from PDF
+            extracted_text = extract_text_from_pdf(uploaded_file)
+
+            if extracted_text:
+                st.success("✅ Text extracted successfully! Sending to API...")
+
+                # Load API URL from environment variables
+                API_URL = os.getenv("UPLOAD_API_URL")
+                if API_URL is None:
+                    st.error("🚨 API URL is not set in environment variables!")
+                    return
+
+                # Call the API with extracted text and unique_id
+                with st.spinner("🔄 Uploading data..."):
+                    response = requests.post(API_URL, json={"unique_id": unique_id, "text": extracted_text})
+
+                if response.status_code == 200:
+                    st.success("✅ PDF data uploaded successfully!")
+                else:
+                    st.error(f"❌ Failed to upload data. Error: {response.text}")
+
+            else:
+                st.warning("⚠️ No text extracted from the PDF. Please check the file.")
+
+# def coming_soon():
+#     st.markdown("<style>h1 { margin-top: -50px; }</style>", unsafe_allow_html=True)
+#     st.title("🚧 Coming Soon")
+#     st.write("New features will be added here in the future!")
 
 if __name__ == "__main__":
     main()
